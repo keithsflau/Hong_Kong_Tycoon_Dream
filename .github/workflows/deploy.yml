@@ -2,8 +2,10 @@ name: Build and deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
+
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -21,10 +23,13 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build
+
+      - name: Add .nojekyll file
+        run: mkdir -p dist && touch dist/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -32,38 +37,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ main, master ]
-
-permissions:
-  contents: write
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Add .nojekyll file
-        run: touch dist/.nojekyll
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
